@@ -1,49 +1,135 @@
 /**
- * PayPal Dispute Reason-to-Evidence Guidance Mapping
+ * PayPal Dispute Reason-to-Evidence Guidance Mapping (AUDITED)
  * 
- * Anchored to official PayPal Developer Documentation:
- * - https://developer.paypal.com/platforms/disputes/handle-disputes/use-disputes-api/
- * - https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/
- * - https://developer.paypal.com/api/customer-disputes/v1/
+ * Sourced directly from official PayPal Developer OpenAPI Specifications & Guides:
+ * - Official OpenAPI: openapi/customer_disputes_v1.json (paypal/paypal-rest-api-specifications)
+ * - Reference: https://developer.paypal.com/api/customer-disputes/v1/
+ * - Guidance: https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/
+ * - Handling Disputes: https://developer.paypal.com/platforms/disputes/handle-disputes/use-disputes-api/
  */
 
+/**
+ * COMPLETE OFFICIAL `evidence_type` ENUM
+ * Extracted directly from components.schemas.evidence.properties.evidence_type.enum
+ * Total Count: Exactly 76 enum identifiers.
+ */
 export const PAYPAL_EVIDENCE_TYPES = [
   'PROOF_OF_FULFILLMENT',
   'PROOF_OF_REFUND',
   'PROOF_OF_DELIVERY_SIGNATURE',
   'PROOF_OF_RECEIPT_COPY',
   'RETURN_POLICY',
-  'ITEM_DESCRIPTION',
-  'COPY_OF_CONTRACT',
+  'BILLING_AGREEMENT',
   'PROOF_OF_RESHIPMENT',
+  'ITEM_DESCRIPTION',
+  'POLICE_REPORT',
+  'AFFIDAVIT',
+  'PAID_WITH_OTHER_METHOD',
+  'COPY_OF_CONTRACT',
+  'TERMINAL_ATM_RECEIPT',
+  'PRICE_DIFFERENCE_REASON',
+  'SOURCE_CONVERSION_RATE',
+  'BANK_STATEMENT',
+  'CREDIT_DUE_REASON',
+  'REQUEST_CREDIT_RECEIPT',
+  'PROOF_OF_RETURN',
+  'CREATE',
+  'CHANGE_REASON',
+  'PROOF_OF_REFUND_OUTSIDE_PAYPAL',
+  'RECEIPT_OF_MERCHANDISE',
+  'CUSTOMS_DOCUMENT',
+  'CUSTOMS_FEE_RECEIPT',
+  'INFORMATION_ON_RESOLUTION',
+  'ADDITIONAL_INFORMATION_OF_ITEM',
+  'DETAILS_OF_PURCHASE',
+  'PROOF_OF_SIGNIFICANT_DIFFERENCE',
+  'PROOF_OF_SOFTWARE_OR_SERVICE_NOT_AS_DESCRIBED',
+  'PROOF_OF_CONFISCATION',
   'PROOF_OF_DAMAGE',
+  'COPY_OF_LAW_ENFORCEMENT_AGENCY_REPORT',
+  'ADDITIONAL_PROOF_OF_SHIPMENT',
+  'PROOF_OF_DENIAL_BY_CARRIER',
   'THIRDPARTY_PROOF_FOR_DAMAGE_OR_SIGNIFICANT_DIFFERENCE',
+  'VALID_SUPPORTING_DOCUMENT',
+  'LEGIBLE_SUPPORTING_DOCUMENT',
+  'RETURN_TRACKING_INFORMATION',
+  'DELIVERY_RECEIPT',
+  'PROOF_OF_INSTORE_RECEIPT',
+  'ADDITIONAL_TRACKING_INFORMATION',
+  'PROOF_OF_SHIPMENT_POSTAGE',
+  'ONLINE_TRACKING_INFORMATION',
+  'PROOF_OF_INSTORE_REFUND',
+  'PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED',
+  'RETURN_ADDRESS_FOR_SHIPPING',
+  'COPY_OF_THE_EPARCEL_MANIFEST',
+  'COPY_OF_SHIPPING_MANIFEST',
+  'APPEAL_AFFIDAVIT',
+  'RECEIPT_OF_REPLACEMENT',
+  'COPY_OF_DRIVERS_LICENSE',
+  'ACCOUNT_CHANGE_INFORMATION',
+  'DELIVERY_ADDRESS',
+  'CONFIRMATION_OF_RESOLUTION',
+  'MERCHANT_RESPONSE',
+  'PERMISSION_DESCRIPTION',
+  'STATUS_OF_MERCHANDISE',
+  'LOST_CARD_DETAILS',
+  'LAST_VALID_TRANSACTION_DETAILS',
+  'ADDITIONAL_PROOF_OF_RETURN',
   'DECLARATION',
   'PROOF_OF_MISSING_ITEMS',
   'PROOF_OF_EMPTY_PACKAGE_OR_DIFFERENT_ITEM',
   'PROOF_OF_ITEM_NOT_RECEIVED',
-  'BILLING_AGREEMENT',
-  'ADDITIONAL_TRACKING_INFORMATION',
-  'CUSTOMS_DOCUMENT',
-  'POLICE_REPORT',
-  'LEGALLY_BINDING_STATEMENT',
-  'MERCHANT_RESPONSE',
+  'ORDER_DETAILS',
+  'LISTING_URL',
+  'SHIPPING_INSURANCE',
+  'BUYER_RESPONSE',
+  'PHOTOS_OF_SHIPPED_ITEM',
+  'OTHER',
+  'CANCELLATION_DETAILS',
+  'MERCHANT_CONTACT_DETAILS',
+  'ITEM_DETAILS',
+  'CORRECT_RECIPIENT_INFORMATION',
+  'EXPLANATION_OF_FUNDS_NOT_DELIVERED',
+] as const;
+
+export type PayPalEvidenceType = typeof PAYPAL_EVIDENCE_TYPES[number];
+
+/**
+ * Audit: Unsupported strings removed from the enum.
+ * These are ordinary supporting document descriptions or general advice,
+ * NOT valid PayPal evidence_type API enum values:
+ * 1. IP_ADDRESS_LOGS (ordinary log description; submitted under PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED or OTHER)
+ * 2. SERVER_ACCESS_LOGS (ordinary log description; submitted under PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED or OTHER)
+ * 3. CUSTOMER_COMMUNICATION (ordinary description; official enums are MERCHANT_RESPONSE or BUYER_RESPONSE)
+ * 4. TERMS_AND_CONDITIONS (ordinary description; official enums are RETURN_POLICY or COPY_OF_CONTRACT)
+ * 5. LEGALLY_BINDING_STATEMENT (ordinary description; official enums are AFFIDAVIT or DECLARATION)
+ * 6. PROOF_OF_SERVICE_DELIVERY (non-standard naming; official enum is PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED)
+ * 7. PROOF_OF_SOFTWARE_LICENSE (non-standard naming; official enum is PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED or ORDER_DETAILS)
+ * 8. PROOF_OF_DIGITAL_DOWNLOAD (non-standard naming; official enum is ORDER_DETAILS or PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED)
+ * 9. CANCELLATION_POLICY (ordinary description; official enums are RETURN_POLICY or CANCELLATION_DETAILS)
+ * 10. PROOF_OF_AUTHENTICITY (ordinary description; official enum is THIRDPARTY_PROOF_FOR_DAMAGE_OR_SIGNIFICANT_DIFFERENCE or VALID_SUPPORTING_DOCUMENT)
+ * 11. APPRAISAL_DOCUMENT (ordinary description; official enum is THIRDPARTY_PROOF_FOR_DAMAGE_OR_SIGNIFICANT_DIFFERENCE)
+ * 12. REBUTTAL_EXPLANATION (ordinary description; official enum is MERCHANT_RESPONSE or OTHER)
+ */
+export const REMOVED_UNSUPPORTED_IDENTIFIERS = [
+  'IP_ADDRESS_LOGS',
+  'SERVER_ACCESS_LOGS',
   'CUSTOMER_COMMUNICATION',
   'TERMS_AND_CONDITIONS',
+  'LEGALLY_BINDING_STATEMENT',
   'PROOF_OF_SERVICE_DELIVERY',
-  'SERVER_ACCESS_LOGS',
-  'IP_ADDRESS_LOGS',
   'PROOF_OF_SOFTWARE_LICENSE',
   'PROOF_OF_DIGITAL_DOWNLOAD',
   'CANCELLATION_POLICY',
   'PROOF_OF_AUTHENTICITY',
   'APPRAISAL_DOCUMENT',
   'REBUTTAL_EXPLANATION',
-  'OTHER',
 ] as const;
 
-export type PayPalEvidenceType = typeof PAYPAL_EVIDENCE_TYPES[number];
-
+/**
+ * Official Dispute Reasons from components.schemas.dispute_reason.enum
+ * Plus legacy/unverified variants supported defensively.
+ */
 export const PAYPAL_DISPUTE_REASONS = [
   'MERCHANDISE_OR_SERVICE_NOT_RECEIVED',
   'MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED',
@@ -53,26 +139,42 @@ export const PAYPAL_DISPUTE_REASONS = [
   'INCORRECT_AMOUNT',
   'PAYMENT_BY_OTHER_MEANS',
   'CANCELED_RECURRING_BILLING',
-  'PROBLEM_WITH_REPLACEMENT',
+  'PROBLEM_WITH_REMITTANCE', // Official 9th enum in OpenAPI schema
+  'PROBLEM_WITH_REPLACEMENT', // Maintained as UNVERIFIED legacy variant
   'OTHER',
 ] as const;
 
 export type PayPalDisputeReason = typeof PAYPAL_DISPUTE_REASONS[number];
 
+export interface MandatoryApiField {
+  field: string;
+  description: string;
+  condition?: string;
+}
+
+export interface DefenseRecommendation {
+  recommendation: string;
+  suggestedEvidenceType: PayPalEvidenceType;
+  policyContext: string;
+}
+
+export interface DefenseChecklistItem {
+  item: string;
+  isApiMandatory: boolean;
+  rationale: string;
+}
+
 export interface ReasonEvidenceRule {
   reason: PayPalDisputeReason;
   friendlyTitle: string;
   docUrl: string;
+  verificationStatus: 'VERIFIED' | 'UNVERIFIED';
   summary: string;
   primaryEvidenceTypes: PayPalEvidenceType[];
   alternativeEvidenceTypes: PayPalEvidenceType[];
-  requiredFields: {
-    field: string;
-    description: string;
-    mandatory: boolean;
-  }[];
-  criticalChecklist: string[];
-  disputeDefenseGuidelines: string[];
+  mandatoryApiFields: MandatoryApiField[];
+  recommendedEvidence: DefenseRecommendation[];
+  defenseChecklist: DefenseChecklistItem[];
   notesCharacterLimit: number;
 }
 
@@ -81,25 +183,77 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'MERCHANDISE_OR_SERVICE_NOT_RECEIVED',
     friendlyTitle: 'Item or Service Not Received (INR)',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#merchandise-or-service-not-received',
+    verificationStatus: 'VERIFIED',
     summary: 'Buyer claims they paid for an item or service but never received it.',
-    primaryEvidenceTypes: ['PROOF_OF_FULFILLMENT', 'PROOF_OF_DELIVERY_SIGNATURE'],
-    alternativeEvidenceTypes: ['ADDITIONAL_TRACKING_INFORMATION', 'PROOF_OF_SERVICE_DELIVERY', 'SERVER_ACCESS_LOGS', 'PROOF_OF_DIGITAL_DOWNLOAD', 'PROOF_OF_REFUND', 'OTHER'],
-    requiredFields: [
-      { field: 'tracking_info.carrier_name', description: 'Carrier name (e.g. FEDEX, UPS, USPS, DHL)', mandatory: true },
-      { field: 'tracking_info.tracking_number', description: 'Valid carrier tracking tracking number', mandatory: true },
-      { field: 'delivery_address_match', description: 'Proof that destination matches the transaction address', mandatory: true },
+    primaryEvidenceTypes: [
+      'PROOF_OF_FULFILLMENT',
+      'PROOF_OF_DELIVERY_SIGNATURE',
+      'ONLINE_TRACKING_INFORMATION',
     ],
-    criticalChecklist: [
-      'Carrier tracking number is provided and active in carrier system',
-      'Delivery address on tracking matches the transaction shipping address',
-      'For high-value items, signature confirmation is attached',
-      'For digital items: Server access/download logs with buyer IP and timestamp are included',
-      'DO NOT claim item was delivered if tracking only indicates label created or in-transit without final delivery event',
+    alternativeEvidenceTypes: [
+      'ADDITIONAL_TRACKING_INFORMATION',
+      'PROOF_OF_SHIPMENT_POSTAGE',
+      'DELIVERY_RECEIPT',
+      'PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED',
+      'ORDER_DETAILS',
+      'PROOF_OF_REFUND',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'If shipping physically: Provide carrier name and tracking number in evidence_info.tracking_info.',
-      'If item is intangible/digital: Provide proof of service delivery or server access logs.',
-      'If already refunded: Provide refund ID under PROOF_OF_REFUND.',
+    mandatoryApiFields: [
+      {
+        field: 'evidence_info.tracking_info.carrier_name',
+        description: 'Carrier name enum or valid string.',
+        condition: "Required if evidence_type is PROOF_OF_FULFILLMENT and tracking_info is provided.",
+      },
+      {
+        field: 'evidence_info.tracking_info.tracking_number',
+        description: 'Valid shipment tracking number.',
+        condition: "Required if evidence_type is PROOF_OF_FULFILLMENT and tracking_info is provided.",
+      },
+      {
+        field: 'evidence_info.tracking_info.carrier_name_other',
+        description: 'Free-form carrier name.',
+        condition: "Mandatory when carrier_name is 'OTHER'.",
+      },
+      {
+        field: 'notes',
+        description: 'Evidence notes strictly capped at 2000 characters.',
+        condition: 'Optional, but max 2000 characters if supplied.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Attach signed proof of delivery confirmation for high-value orders.',
+        suggestedEvidenceType: 'PROOF_OF_DELIVERY_SIGNATURE',
+        policyContext: 'PayPal Seller Protection policy requires signature confirmation for physical orders >= $750 USD (or local currency equivalent). Note: Signature is a policy recommendation, not an API schema mandatory field.',
+      },
+      {
+        recommendation: 'Provide digital delivery access logs or confirmation for intangible goods.',
+        suggestedEvidenceType: 'PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED',
+        policyContext: 'Demonstrates digital fulfillment with timestamps and buyer association.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Carrier tracking number provided in evidence_info.tracking_info',
+        isApiMandatory: true,
+        rationale: 'Mandatory in schema when submitting PROOF_OF_FULFILLMENT tracking info.',
+      },
+      {
+        item: 'Tracking confirms delivery to buyer shipping destination address on transaction',
+        isApiMandatory: false,
+        rationale: 'Required by PayPal Seller Protection rules to win an INR dispute.',
+      },
+      {
+        item: 'Signature proof attached for transactions >= $750 USD',
+        isApiMandatory: false,
+        rationale: 'Seller Protection policy threshold requirement, not an API validation rule.',
+      },
+      {
+        item: 'Do not claim completed delivery if tracking shows in-transit or label created',
+        isApiMandatory: false,
+        rationale: 'Unsupported claims of delivery without carrier confirmation will lead to dispute loss.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
@@ -108,25 +262,65 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED',
     friendlyTitle: 'Significantly Not As Described (SNAD)',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#merchandise-or-service-not-as-described',
-    summary: 'Buyer received the item but claims it is materially different from the listing or broken/counterfeit.',
-    primaryEvidenceTypes: ['ITEM_DESCRIPTION', 'RETURN_POLICY'],
-    alternativeEvidenceTypes: ['CUSTOMER_COMMUNICATION', 'PROOF_OF_AUTHENTICITY', 'APPRAISAL_DOCUMENT', 'PROOF_OF_REFUND', 'OTHER'],
-    requiredFields: [
-      { field: 'item_description_proof', description: 'Original item listing, specifications, and condition photos', mandatory: true },
-      { field: 'return_policy_proof', description: 'Merchant return/cancellation policy accepted at checkout', mandatory: true },
-      { field: 'notes', description: 'Point-by-point rebuttal clarifying how product matched specifications', mandatory: true },
+    verificationStatus: 'VERIFIED',
+    summary: 'Buyer received merchandise or service but claims it significantly differs from description, arrived damaged, or is missing parts.',
+    primaryEvidenceTypes: [
+      'ITEM_DESCRIPTION',
+      'RETURN_POLICY',
+      'LISTING_URL',
     ],
-    criticalChecklist: [
-      'Catalog or checkout listing showing exact specifications promised to buyer',
-      'Clear documentation of item condition prior to dispatch',
-      'Return policy displayed at checkout clearly identified',
-      'Customer support communications showing buyer statements or usage',
-      'DO NOT contradict the buyer complaint with generic claims without referencing original listing details',
+    alternativeEvidenceTypes: [
+      'ORDER_DETAILS',
+      'PHOTOS_OF_SHIPPED_ITEM',
+      'PROOF_OF_SIGNIFICANT_DIFFERENCE',
+      'PROOF_OF_DAMAGE',
+      'THIRDPARTY_PROOF_FOR_DAMAGE_OR_SIGNIFICANT_DIFFERENCE',
+      'VALID_SUPPORTING_DOCUMENT',
+      'PROOF_OF_SOFTWARE_OR_SERVICE_NOT_AS_DESCRIBED',
+      'PROOF_OF_REFUND',
+      'MERCHANT_RESPONSE',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'Show that the item delivered matched the specifications and description provided prior to sale.',
-      'Attach copy of return policy or terms of service.',
-      'If buyer altered or damaged item after receipt, document third-party proof or correspondence.',
+    mandatoryApiFields: [
+      {
+        field: 'notes',
+        description: 'Rebuttal narrative clarifying how product matched published specifications.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+      {
+        field: 'file1',
+        description: 'Document attachment (.pdf, .png, .jpg, .gif) up to 10 MB.',
+        condition: 'Optional, but must conform to format/size limits if provided.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Submit original product catalog listing, checkout screenshots, and specs.',
+        suggestedEvidenceType: 'ITEM_DESCRIPTION',
+        policyContext: 'Proves the item received matched the listing details agreed upon at purchase.',
+      },
+      {
+        recommendation: 'Attach terms of sale and store return/replacement policy.',
+        suggestedEvidenceType: 'RETURN_POLICY',
+        policyContext: 'Demonstrates terms accepted by customer at checkout.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Original catalog listing or item description provided',
+        isApiMandatory: false,
+        rationale: 'Primary defense evidence to refute SNAD claim.',
+      },
+      {
+        item: 'Published return policy provided',
+        isApiMandatory: false,
+        rationale: 'Demonstrates agreed return procedures and requirements.',
+      },
+      {
+        item: 'Identify contradictions between customer complaint and catalog specs',
+        isApiMandatory: false,
+        rationale: 'Directly undermines subjective or contradictory buyer claims.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
@@ -135,22 +329,53 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'UNAUTHORISED',
     friendlyTitle: 'Unauthorized Transaction / Fraud',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#unauthorized-transaction',
-    summary: 'Buyer or account holder claims they did not initiate or approve the transaction.',
-    primaryEvidenceTypes: ['PROOF_OF_FULFILLMENT', 'IP_ADDRESS_LOGS'],
-    alternativeEvidenceTypes: ['SERVER_ACCESS_LOGS', 'CUSTOMER_COMMUNICATION', 'COPY_OF_CONTRACT', 'POLICE_REPORT', 'OTHER'],
-    requiredFields: [
-      { field: 'shipping_address_verification', description: 'Proof shipped to address provided in PayPal seller protection details', mandatory: true },
-      { field: 'ip_or_session_logs', description: 'Login or checkout IP address matching buyer location', mandatory: false },
+    verificationStatus: 'VERIFIED',
+    summary: 'Account holder claims they did not initiate or authorize the payment.',
+    primaryEvidenceTypes: [
+      'PROOF_OF_FULFILLMENT',
+      'DELIVERY_RECEIPT',
+      'PROOF_OF_DELIVERY_SIGNATURE',
     ],
-    criticalChecklist: [
-      'Item shipped to the verified address on the PayPal transaction details page',
-      'Carrier tracking showing delivery to that specific postal code',
-      'Authentication logs or prior purchase history from the same customer account',
-      'Customer communication acknowledging purchase before chargeback was filed',
+    alternativeEvidenceTypes: [
+      'COPY_OF_LAW_ENFORCEMENT_AGENCY_REPORT',
+      'POLICE_REPORT',
+      'AFFIDAVIT',
+      'DECLARATION',
+      'PROOF_FOR_SOFTWARE_OR_SERVICE_DELIVERED',
+      'ORDER_DETAILS',
+      'MERCHANT_RESPONSE',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'PayPal Seller Protection protects unauthorized claims if shipped to the address on the Transaction Details page with online tracking.',
-      'Provide IP access logs, device fingerprint, or buyer correspondence confirming authorization.',
+    mandatoryApiFields: [
+      {
+        field: 'evidence_info.tracking_info',
+        description: 'Tracking details if submitting PROOF_OF_FULFILLMENT.',
+        condition: 'Expected when evidence_type is PROOF_OF_FULFILLMENT.',
+      },
+      {
+        field: 'notes',
+        description: 'Defense explanation.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Provide proof item shipped to the verified address on the transaction details page.',
+        suggestedEvidenceType: 'PROOF_OF_FULFILLMENT',
+        policyContext: 'PayPal Seller Protection covers unauthorized transactions if physical goods are shipped with valid tracking to the transaction shipping address.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Shipment delivered to the seller protection eligible address on the transaction',
+        isApiMandatory: false,
+        rationale: 'Critical criterion for PayPal Seller Protection coverage against unauthorized claims.',
+      },
+      {
+        item: 'Online carrier tracking records attached',
+        isApiMandatory: false,
+        rationale: 'Validates physical transit and delivery point.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
@@ -159,21 +384,57 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'CREDIT_NOT_PROCESSED',
     friendlyTitle: 'Credit or Refund Not Processed',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#credit-not-processed',
-    summary: 'Buyer claims they returned merchandise or canceled order/service but refund was not credited.',
-    primaryEvidenceTypes: ['PROOF_OF_REFUND', 'RETURN_POLICY'],
-    alternativeEvidenceTypes: ['TERMS_AND_CONDITIONS', 'CUSTOMER_COMMUNICATION', 'REBUTTAL_EXPLANATION', 'OTHER'],
-    requiredFields: [
-      { field: 'refund_ids', description: 'PayPal refund transaction ID if refund was already executed', mandatory: false },
-      { field: 'policy_or_return_status', description: 'Proof item was not returned or return window lapsed', mandatory: true },
+    verificationStatus: 'VERIFIED',
+    summary: 'Buyer claims they returned merchandise or canceled a transaction but did not receive refund or credit.',
+    primaryEvidenceTypes: [
+      'PROOF_OF_REFUND',
+      'RETURN_POLICY',
+      'CANCELLATION_DETAILS',
     ],
-    criticalChecklist: [
-      'If refund was issued: specify exact PayPal refund transaction ID in evidence_info.refund_ids',
-      'If refund is NOT due: provide store return policy showing non-refundable terms or return window expiry',
-      'Carrier return tracking check: verify if merchant actually received returned package in original condition',
+    alternativeEvidenceTypes: [
+      'PROOF_OF_REFUND_OUTSIDE_PAYPAL',
+      'PROOF_OF_INSTORE_REFUND',
+      'CREDIT_DUE_REASON',
+      'REQUEST_CREDIT_RECEIPT',
+      'COPY_OF_CONTRACT',
+      'MERCHANT_RESPONSE',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'If refund was processed, supply PROOF_OF_REFUND with refund_ids.',
-      'If buyer never returned goods or returned empty box, supply return inspection records and terms.',
+    mandatoryApiFields: [
+      {
+        field: 'evidence_info.refund_ids',
+        description: 'Array of PayPal refund transaction IDs.',
+        condition: 'Expected in schema when evidence_type is PROOF_OF_REFUND.',
+      },
+      {
+        field: 'notes',
+        description: 'Explanation if refund is not due.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'If refund was executed, provide the settled PayPal refund transaction ID.',
+        suggestedEvidenceType: 'PROOF_OF_REFUND',
+        policyContext: 'Conclusively proves refund was already credited via PayPal ledger.',
+      },
+      {
+        recommendation: 'If refund is not due, provide return policy showing item was non-returnable or outside window.',
+        suggestedEvidenceType: 'RETURN_POLICY',
+        policyContext: 'Demonstrates buyer is not entitled to credit per agreed checkout terms.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'PayPal refund ID supplied in evidence_info.refund_ids (if refunded)',
+        isApiMandatory: false,
+        rationale: 'API schema expects refund_ids for PROOF_OF_REFUND.',
+      },
+      {
+        item: 'Return policy documentation attached (if refund refused)',
+        isApiMandatory: false,
+        rationale: 'Proves merchant adhered to agreed cancellation and return guidelines.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
@@ -182,21 +443,40 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'DUPLICATE_TRANSACTION',
     friendlyTitle: 'Duplicate Billing / Multiple Charges',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#duplicate-transaction',
+    verificationStatus: 'VERIFIED',
     summary: 'Buyer claims they were billed multiple times for a single order.',
-    primaryEvidenceTypes: ['REBUTTAL_EXPLANATION', 'PROOF_OF_RECEIPT_COPY'],
-    alternativeEvidenceTypes: ['PROOF_OF_FULFILLMENT', 'PROOF_OF_REFUND', 'OTHER'],
-    requiredFields: [
-      { field: 'order_identifiers', description: 'Distinct invoice or order IDs for each charge', mandatory: true },
-      { field: 'fulfillment_records', description: 'Proof of distinct fulfillment for each transaction', mandatory: true },
+    primaryEvidenceTypes: [
+      'PROOF_OF_RECEIPT_COPY',
+      'DETAILS_OF_PURCHASE',
+      'MERCHANT_RESPONSE',
     ],
-    criticalChecklist: [
-      'Check whether merchant received two payments for one order or two separate orders',
-      'If two separate orders: show distinct order IDs, separate shipment tracking numbers, and buyer confirmations',
-      'If accidental duplicate: issue refund immediately and submit PROOF_OF_REFUND with refund ID',
+    alternativeEvidenceTypes: [
+      'PROOF_OF_FULFILLMENT',
+      'ORDER_DETAILS',
+      'TERMINAL_ATM_RECEIPT',
+      'PROOF_OF_REFUND',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'Prove that each charge corresponds to an independent order or item fulfilled separately.',
-      'Show distinct invoices with itemized totals and delivery tracking.',
+    mandatoryApiFields: [
+      {
+        field: 'notes',
+        description: 'Clarification of distinct transactions or orders.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Provide distinct invoices or checkout receipts showing independent orders.',
+        suggestedEvidenceType: 'PROOF_OF_RECEIPT_COPY',
+        policyContext: 'Proves multiple charges correspond to distinct orders fulfilled separately.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Separate order identifiers or invoices documented',
+        isApiMandatory: false,
+        rationale: 'Shows transactions represent separate purchases.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
@@ -205,20 +485,41 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'INCORRECT_AMOUNT',
     friendlyTitle: 'Incorrect Amount Billed',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#incorrect-amount',
-    summary: 'Buyer claims the charged amount differs from the agreed price or invoice.',
-    primaryEvidenceTypes: ['PROOF_OF_RECEIPT_COPY', 'ITEM_DESCRIPTION'],
-    alternativeEvidenceTypes: ['COPY_OF_CONTRACT', 'PROOF_OF_REFUND', 'OTHER'],
-    requiredFields: [
-      { field: 'receipt_breakdown', description: 'Itemized checkout invoice showing subtotal, shipping, and taxes', mandatory: true },
-      { field: 'pricing_agreement', description: 'Promotional terms or pricing schedule agreed by customer', mandatory: true },
+    verificationStatus: 'VERIFIED',
+    summary: 'Buyer claims the billed amount differs from the agreed checkout price.',
+    primaryEvidenceTypes: [
+      'PROOF_OF_RECEIPT_COPY',
+      'PRICE_DIFFERENCE_REASON',
+      'ITEM_DESCRIPTION',
     ],
-    criticalChecklist: [
-      'Checkout receipt breakdown matching transaction total exactly',
-      'Proof customer accepted shipping fees, taxes, or currency conversion rules at checkout',
-      'If overcharged in error: issue partial refund and provide refund ID',
+    alternativeEvidenceTypes: [
+      'SOURCE_CONVERSION_RATE',
+      'COPY_OF_CONTRACT',
+      'ORDER_DETAILS',
+      'PROOF_OF_REFUND',
+      'MERCHANT_RESPONSE',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'Provide itemized receipt or contract showing how final charged amount was calculated.',
+    mandatoryApiFields: [
+      {
+        field: 'notes',
+        description: 'Explanation of pricing calculation and adjustments.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Provide checkout receipt showing itemized charges, shipping, and taxes.',
+        suggestedEvidenceType: 'PROOF_OF_RECEIPT_COPY',
+        policyContext: 'Demonstrates total charged corresponds to customer-approved checkout amount.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Itemized checkout invoice matching billed total',
+        isApiMandatory: false,
+        rationale: 'Refutes unauthorized price increase claims.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
@@ -227,19 +528,40 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'PAYMENT_BY_OTHER_MEANS',
     friendlyTitle: 'Paid by Other Means',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#payment-by-other-means',
-    summary: 'Buyer claims they paid for this item using a different payment method (cash, card, check).',
-    primaryEvidenceTypes: ['PROOF_OF_RECEIPT_COPY', 'REBUTTAL_EXPLANATION'],
-    alternativeEvidenceTypes: ['PROOF_OF_REFUND', 'OTHER'],
-    requiredFields: [
-      { field: 'ledger_proof', description: 'Merchant accounting ledger showing PayPal was the sole payment settled', mandatory: true },
+    verificationStatus: 'VERIFIED',
+    summary: 'Buyer claims they paid for this item using an alternative payment method (cash, card, check).',
+    primaryEvidenceTypes: [
+      'PAID_WITH_OTHER_METHOD',
+      'BANK_STATEMENT',
+      'PROOF_OF_RECEIPT_COPY',
     ],
-    criticalChecklist: [
-      'Check accounting records to verify whether customer paid twice',
-      'If alternative payment was received: refund the PayPal payment and provide refund ID',
-      'If no alternative payment was received: provide invoice showing PayPal is the only recorded payment',
+    alternativeEvidenceTypes: [
+      'TERMINAL_ATM_RECEIPT',
+      'PROOF_OF_INSTORE_RECEIPT',
+      'PROOF_OF_REFUND',
+      'MERCHANT_RESPONSE',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'Show merchant invoice and ledger indicating PayPal transaction settled the order.',
+    mandatoryApiFields: [
+      {
+        field: 'notes',
+        description: 'Accounting reconciliation notes.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Provide merchant ledger demonstrating PayPal payment is the only settled payment for the order.',
+        suggestedEvidenceType: 'PROOF_OF_RECEIPT_COPY',
+        policyContext: 'Clarifies that no duplicate payment was received through other channels.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Accounting ledger showing order payment status',
+        isApiMandatory: false,
+        rationale: 'Proves whether double payment occurred or not.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
@@ -248,42 +570,125 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'CANCELED_RECURRING_BILLING',
     friendlyTitle: 'Canceled Recurring Subscription / Billing',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#canceled-recurring-billing',
-    summary: 'Buyer claims they were billed for a subscription or recurring plan after cancellation.',
-    primaryEvidenceTypes: ['BILLING_AGREEMENT', 'CANCELLATION_POLICY'],
-    alternativeEvidenceTypes: ['CUSTOMER_COMMUNICATION', 'COPY_OF_CONTRACT', 'PROOF_OF_REFUND', 'OTHER'],
-    requiredFields: [
-      { field: 'billing_agreement_terms', description: 'Terms of recurring billing and notice period for cancellation', mandatory: true },
-      { field: 'cancellation_timestamp_log', description: 'Timestamp when cancellation request was submitted vs when billing occurred', mandatory: true },
+    verificationStatus: 'VERIFIED',
+    summary: 'Buyer claims they were billed for a recurring subscription after cancellation.',
+    primaryEvidenceTypes: [
+      'BILLING_AGREEMENT',
+      'CANCELLATION_DETAILS',
+      'RETURN_POLICY',
     ],
-    criticalChecklist: [
-      'Subscription terms accepted at signup specifying cancellation notice period',
-      'System log of cancellation request showing charge was initiated prior to effective cancellation date',
-      'Usage records showing customer used service during the billed period',
+    alternativeEvidenceTypes: [
+      'COPY_OF_CONTRACT',
+      'MERCHANT_CONTACT_DETAILS',
+      'PROOF_OF_REFUND',
+      'MERCHANT_RESPONSE',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'Submit the signed billing agreement or electronic signup terms.',
-      'Document cancellation policy cutoff rules and timestamp logs.',
+    mandatoryApiFields: [
+      {
+        field: 'notes',
+        description: 'Subscription terms and cancellation chronology.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Provide signed billing agreement terms and timestamp log of cancellation request.',
+        suggestedEvidenceType: 'BILLING_AGREEMENT',
+        policyContext: 'Proves billing occurred in accordance with agreement terms prior to effective cancellation cutoff.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Subscription agreement terms accepted at signup',
+        isApiMandatory: false,
+        rationale: 'Establishes cancellation notice periods and terms.',
+      },
+      {
+        item: 'Timestamp log of cancellation request vs billing date',
+        isApiMandatory: false,
+        rationale: 'Demonstrates charge was processed before cancellation became effective.',
+      },
+    ],
+    notesCharacterLimit: 2000,
+  },
+
+  PROBLEM_WITH_REMITTANCE: {
+    reason: 'PROBLEM_WITH_REMITTANCE',
+    friendlyTitle: 'Problem with Remittance',
+    docUrl: 'https://developer.paypal.com/api/customer-disputes/v1/#definition-dispute_reason',
+    verificationStatus: 'VERIFIED',
+    summary: 'A problem occurred with the remittance or funds transfer.',
+    primaryEvidenceTypes: [
+      'EXPLANATION_OF_FUNDS_NOT_DELIVERED',
+      'CORRECT_RECIPIENT_INFORMATION',
+      'BANK_STATEMENT',
+    ],
+    alternativeEvidenceTypes: [
+      'PROOF_OF_REFUND',
+      'MERCHANT_RESPONSE',
+      'OTHER',
+    ],
+    mandatoryApiFields: [
+      {
+        field: 'notes',
+        description: 'Explanation regarding funds delivery and recipient details.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Provide documentation showing recipient information and transfer records.',
+        suggestedEvidenceType: 'CORRECT_RECIPIENT_INFORMATION',
+        policyContext: 'Validates delivery of transferred funds to intended recipient.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Funds transfer record and recipient verification',
+        isApiMandatory: false,
+        rationale: 'Demonstrates correct disposition of remittance funds.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
 
   PROBLEM_WITH_REPLACEMENT: {
     reason: 'PROBLEM_WITH_REPLACEMENT',
-    friendlyTitle: 'Problem with Replacement Item',
-    docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/#problem-with-replacement',
-    summary: 'Buyer received a replacement item that was also damaged, defective, or not received.',
-    primaryEvidenceTypes: ['PROOF_OF_RESHIPMENT', 'PROOF_OF_DELIVERY_SIGNATURE'],
-    alternativeEvidenceTypes: ['CUSTOMER_COMMUNICATION', 'PROOF_OF_DAMAGE', 'OTHER'],
-    requiredFields: [
-      { field: 'replacement_tracking', description: 'Carrier name and tracking number for the replacement shipment', mandatory: true },
+    friendlyTitle: 'Problem with Replacement (Legacy Variant)',
+    docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/',
+    verificationStatus: 'UNVERIFIED',
+    summary: 'Customer reports issue with a replacement item. (Note: Not an official dispute_reason enum in OpenAPI schema; mapped defensively).',
+    primaryEvidenceTypes: [
+      'PROOF_OF_RESHIPMENT',
+      'RECEIPT_OF_REPLACEMENT',
     ],
-    criticalChecklist: [
-      'Tracking number specifically for replacement package',
-      'Customer support messages agreeing to replacement terms',
-      'Carrier delivery confirmation for replacement',
+    alternativeEvidenceTypes: [
+      'PROOF_OF_DELIVERY_SIGNATURE',
+      'PROOF_OF_DAMAGE',
+      'MERCHANT_RESPONSE',
+      'OTHER',
     ],
-    disputeDefenseGuidelines: [
-      'Provide proof of reshipment with active carrier tracking and proof of delivery.',
+    mandatoryApiFields: [
+      {
+        field: 'notes',
+        description: 'Details of replacement agreement and tracking.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Provide carrier tracking and label for replacement shipment.',
+        suggestedEvidenceType: 'PROOF_OF_RESHIPMENT',
+        policyContext: 'Shows replacement merchandise was dispatched.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Replacement shipment tracking details provided',
+        isApiMandatory: false,
+        rationale: 'Confirms reshipment of replacement item.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
@@ -292,19 +697,39 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
     reason: 'OTHER',
     friendlyTitle: 'Other / General Dispute',
     docUrl: 'https://developer.paypal.com/docs/platforms/disputes/reference/dispute-reasons-and-evidence/',
+    verificationStatus: 'VERIFIED',
     summary: 'Dispute reason not covered by standard categories.',
-    primaryEvidenceTypes: ['MERCHANT_RESPONSE', 'CUSTOMER_COMMUNICATION'],
-    alternativeEvidenceTypes: ['PROOF_OF_FULFILLMENT', 'PROOF_OF_REFUND', 'OTHER'],
-    requiredFields: [
-      { field: 'notes', description: 'Comprehensive factual chronological narrative under 2000 characters', mandatory: true },
+    primaryEvidenceTypes: [
+      'MERCHANT_RESPONSE',
+      'OTHER',
+      'DECLARATION',
     ],
-    criticalChecklist: [
-      'Clear timeline of events from order to dispute',
-      'Relevant supporting documentation attached (max 10MB file1)',
-      'Direct rebuttal addressing specific claims made in dispute history',
+    alternativeEvidenceTypes: [
+      'AFFIDAVIT',
+      'ORDER_DETAILS',
+      'PROOF_OF_FULFILLMENT',
+      'PROOF_OF_REFUND',
     ],
-    disputeDefenseGuidelines: [
-      'Provide structured merchant response with supporting evidence files.',
+    mandatoryApiFields: [
+      {
+        field: 'notes',
+        description: 'Comprehensive factual chronological narrative.',
+        condition: 'Must not exceed 2000 characters.',
+      },
+    ],
+    recommendedEvidence: [
+      {
+        recommendation: 'Provide chronological narrative and supporting documents.',
+        suggestedEvidenceType: 'MERCHANT_RESPONSE',
+        policyContext: 'Gives the reviewer a coherent timeline of the transaction.',
+      },
+    ],
+    defenseChecklist: [
+      {
+        item: 'Chronological timeline of transaction and dispute',
+        isApiMandatory: false,
+        rationale: 'Standard best practice for general claims.',
+      },
     ],
     notesCharacterLimit: 2000,
   },
