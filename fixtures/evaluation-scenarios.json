@@ -1,0 +1,139 @@
+[
+  {
+    "scenario_id": "scenario_inr_tracking_no_delivery",
+    "name": "Scenario 1: INR with Tracking Present but Delivery Proof Missing",
+    "description": "Item Not Received dispute where carrier tracking exists, but delivery signature confirmation is absent.",
+    "dispute": {
+      "dispute_id": "PP-D-48921",
+      "create_time": "2026-11-02T14:22:10Z",
+      "update_time": "2026-11-03T09:15:00Z",
+      "dispute_amount": { "currency_code": "USD", "value": "189.99" },
+      "status": "WAITING_FOR_SELLER_RESPONSE",
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "links": [
+        { "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-D-48921/provide-evidence", "rel": "provide-evidence", "method": "POST" }
+      ],
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "8AA9381028471923C",
+          "gross_amount": { "currency_code": "USD", "value": "189.99" },
+          "buyer": { "name": "Sarah Jenkins", "email": "sarah.jenkins.test@example.com" },
+          "items": [{ "item_name": "Studio Wireless Pro Headphones (Matte Black)", "item_price": { "currency_code": "USD", "value": "189.99" } }]
+        }
+      ],
+      "messages": [
+        {
+          "posted_by": "BUYER",
+          "time_posted": "2026-11-02T14:22:10Z",
+          "content": "I ordered these headphones over 5 days ago and courier status shows Label Created. Package has not arrived."
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "PROOF_OF_FULFILLMENT",
+          "source": "SELLER",
+          "evidence_info": {
+            "tracking_info": [
+              { "carrier_name": "UPS", "tracking_number": "1Z999AA10123456784" }
+            ]
+          },
+          "notes": "UPS tracking assigned."
+        }
+      ]
+    },
+    "merchant_items": [],
+    "expected_findings": {
+      "must_have_relevant_evidence_type": "PROOF_OF_FULFILLMENT",
+      "must_flag_missing_evidence_type": "PROOF_OF_DELIVERY_SIGNATURE",
+      "must_flag_unsupported_delivery_claim": true,
+      "expected_readiness_status_for_delivery": "WARNING"
+    }
+  },
+  {
+    "scenario_id": "scenario_snad_contradiction",
+    "name": "Scenario 2: SNAD with Product Description and Complaint Contradiction",
+    "description": "Item Not As Described claim where customer asserts item was advertised as flawless, contradicting catalog listing.",
+    "dispute": {
+      "dispute_id": "PP-D-51203",
+      "create_time": "2026-11-04T11:10:45Z",
+      "update_time": "2026-11-05T08:30:00Z",
+      "dispute_amount": { "currency_code": "USD", "value": "349.50" },
+      "status": "WAITING_FOR_SELLER_RESPONSE",
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+      "links": [
+        { "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-D-51203/provide-evidence", "rel": "provide-evidence", "method": "POST" }
+      ],
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "4KL8829102938475P",
+          "gross_amount": { "currency_code": "USD", "value": "349.50" },
+          "buyer": { "name": "Marcus Vance", "email": "marcus.vance.test@example.com" },
+          "items": [{ "item_name": "Refurbished Mechanical Chronograph Watch", "item_price": { "currency_code": "USD", "value": "349.50" } }]
+        }
+      ],
+      "messages": [
+        {
+          "posted_by": "BUYER",
+          "time_posted": "2026-11-04T11:10:45Z",
+          "content": "The watch arrived with severe scratches on dial face. Listing claimed flawless brand-new stock with full box, not vintage with patina."
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "ITEM_DESCRIPTION",
+          "source": "SELLER",
+          "notes": "Original listing explicitly specified 'Grade-A Refurbished with vintage patina'. Buyer confirmed terms at checkout."
+        }
+      ]
+    },
+    "merchant_items": [],
+    "expected_findings": {
+      "must_detect_contradiction": true,
+      "expected_contradiction_severity": "HIGH",
+      "must_have_relevant_evidence_type": "ITEM_DESCRIPTION"
+    }
+  },
+  {
+    "scenario_id": "scenario_refund_incomplete",
+    "name": "Scenario 3: Credit Not Processed with Incomplete Refund Record",
+    "description": "Refund dispute where an unverified accounting note exists but settled PayPal ledger refund ID is missing.",
+    "dispute": {
+      "dispute_id": "PP-D-63810",
+      "create_time": "2026-11-01T09:00:00Z",
+      "update_time": "2026-11-06T15:20:00Z",
+      "dispute_amount": { "currency_code": "USD", "value": "75.00" },
+      "status": "UNDER_REVIEW",
+      "reason": "CREDIT_NOT_PROCESSED",
+      "links": [],
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "9ZZ1122334455667K",
+          "gross_amount": { "currency_code": "USD", "value": "75.00" },
+          "buyer": { "name": "Elena Rostova", "email": "elena.rostova.test@example.com" },
+          "items": [{ "item_name": "Annual SaaS Analytics Tier", "item_price": { "currency_code": "USD", "value": "75.00" } }]
+        }
+      ],
+      "messages": [
+        {
+          "posted_by": "BUYER",
+          "time_posted": "2026-11-01T09:00:00Z",
+          "content": "Requested account cancellation on Oct 20. Refund was promised but my statement has no credit."
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "PROOF_OF_REFUND",
+          "source": "SELLER",
+          "evidence_info": { "refund_ids": ["REF-TEST-9920194"] },
+          "notes": "Partial refund initiated via banking portal, pending final PayPal reconciliation."
+        }
+      ]
+    },
+    "merchant_items": [],
+    "expected_findings": {
+      "must_mark_refund_unverified": true,
+      "must_flag_missing_evidence_type": "PROOF_OF_REFUND",
+      "must_recommend_action_type": "PROOF_OF_REFUND"
+    }
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "name": "disputeready",
+  "version": "1.0.0",
+  "description": "DisputeReady - AI PayPal Dispute Evidence Copilot",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types src/server/index.ts",
+    "dev": "node --experimental-strip-types src/server/index.ts",
+    "test": "node --experimental-strip-types scripts/test-dispute-service.ts",
+    "eval": "node --experimental-strip-types scripts/run-eval.ts",
+    "smoke": "node --experimental-strip-types scripts/smoke-test.ts"
+  },
+  "keywords": [
+    "paypal",
+    "disputes",
+    "ai",
+    "copilot",
+    "evidence"
+  ],
+  "author": "DisputeReady Team",
+  "license": "MIT"
+}
