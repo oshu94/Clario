@@ -1,4 +1,4 @@
-# DisputeReady: AI PayPal Dispute Evidence Copilot
+# Clario: AI PayPal Dispute Evidence Copilot
 
 > **Built for the PayPal AI Hackathon**  
 > An intelligent evidence copilot and defense workstation for merchants responding to customer disputes on the PayPal Customer Disputes API (`v1/customer/disputes`). Anchored directly to official PayPal dispute reason guidance and strict HATEOAS lifecycle state rules.
@@ -9,7 +9,7 @@
 
 Merchant dispute defense is error-prone, fragmented, and governed by strict regulatory windows. Merchants frequently submit the wrong evidence types (e.g. submitting generic invoices for Item Not Received claims instead of carrier tracking and delivery signatures), make unverified factual claims that trigger automatic claim forfeiture, or miss strict PayPal deadlines.
 
-**DisputeReady** provides a verified, AI-powered defense copilot:
+**Clario** provides a verified, AI-powered defense copilot:
 - **Grounded in Official PayPal Truth**: Grounded directly in the official `v1/customer/disputes` schemas and the 32-value `evidence_type` specification.
 - **Strict Evidence Citation & Anti-Hallucination**: Every AI finding and every sentence in the response draft must cite an existing input `source_id`. Facts without proof are explicitly marked `UNVERIFIED`.
 - **Reason-Specific Compliance**: Differentiates between Item Not Received (requiring carrier tracking and signature proof), Not As Described (detecting listing vs complaint contradictions), and Credit Not Processed (requiring verified PayPal ledger refund IDs).
@@ -24,12 +24,12 @@ Merchant dispute defense is error-prone, fragmented, and governed by strict regu
 
 ## 2. Quickstart & Installation
 
-DisputeReady is designed with zero bloated dependencies and runs immediately with Node.js v20+:
+Clario is designed with zero bloated dependencies and runs immediately with Node.js v20+:
 
 ```bash
 # Clone the repository and navigate into the workspace
 git clone <repo-url>
-cd disputeready
+cd Clario
 
 # 1. Copy environment template
 cp .env.example .env
@@ -70,13 +70,13 @@ Per official PayPal requirements, disputes must originate from a **buyer payment
 4. Copy the **Transaction ID** (e.g., `8AA1234567890123C`). This is your `BUYER_TRANSACTION_ID`.
 
 ### Step 3: Create Sandbox Dispute via Script
-DisputeReady provides an automated script that signs an unsigned JWT assertion and submits a multipart dispute creation request:
+Clario provides an automated script that signs an unsigned JWT assertion and submits a multipart dispute creation request:
 
 ```bash
 node --experimental-strip-types scripts/create-sandbox-dispute.ts <BUYER_TRANSACTION_ID> <BUYER_EMAIL> [REASON] [AMOUNT] [CURRENCY]
 ```
 
-*Note on Sandbox Scope Restrictions:* The buyer-side endpoint `POST /v1/customer/disputes` requires the `DISPUTE_CREATE` scope (`https://uri.paypal.com/services/disputes/create`), which PayPal developer docs state is enabled by PayPal account managers. If your sandbox app lacks this scope, the script will print a clear scope notice. DisputeReady handles this cleanly by supporting real merchant-side listing/retrieval against existing sandbox disputes, or falling back to verified fixtures labeled `SIMULATION`.
+*Note on Sandbox Scope Restrictions:* The buyer-side endpoint `POST /v1/customer/disputes` requires the `DISPUTE_CREATE` scope (`https://uri.paypal.com/services/disputes/create`), which PayPal developer docs state is enabled by PayPal account managers. If your sandbox app lacks this scope, the script will print a clear scope notice. Clario handles this cleanly by supporting real merchant-side listing/retrieval against existing sandbox disputes, or falling back to verified fixtures labeled `SIMULATION`.
 
 ---
 
@@ -95,12 +95,12 @@ node --experimental-strip-types scripts/create-sandbox-dispute.ts <BUYER_TRANSAC
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                       DisputeReady UI                       │
+│                       Clario UI                             │
 │    (Dashboard · Evidence Workspace · AI Copilot Panel)      │
 └──────────────────────────────┬──────────────────────────────┘
                                │ HTTP / REST
 ┌──────────────────────────────▼──────────────────────────────┐
-│                  DisputeReady Server Engine                 │
+│                  Clario Server Engine                       │
 │              (src/server/index.ts - Node v24)               │
 └──────────────┬───────────────────────────────┬──────────────┘
                │                               │
