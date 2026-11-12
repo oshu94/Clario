@@ -1,5 +1,5 @@
 /**
- * DISPUTEREADY — Full-Stack End-to-End Test Suite (In-Process)
+ * Clario — Full-Stack End-to-End Test Suite (In-Process)
  * 
  * Verifies the actual server dispatcher (`handleRequest`) and all REST API endpoints:
  * 1. Health check & status endpoint
@@ -91,7 +91,7 @@ function executeRequest(options: {
 
 async function runEndToEndTests() {
   console.log('================================================================');
-  console.log('       DISPUTEREADY — Full-Stack End-to-End Test Suite         ');
+  console.log('       Clario — Full-Stack End-to-End Test Suite         ');
   console.log('================================================================\n');
 
   // Test 1: Health Endpoint

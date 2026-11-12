@@ -1,5 +1,5 @@
 /**
- * DISPUTEREADY — Automated Evaluation Harness (`npm run eval`)
+ * Clario — Automated Evaluation Harness (`npm run eval`)
  * 
  * Strict Hackathon Rule Compliance:
  * - "Create three synthetic scenarios as JSON fixtures with expected findings defined BEFORE running the analysis:
@@ -35,7 +35,7 @@ interface EvaluationScenario {
 
 async function runEvaluation() {
   console.log('================================================================');
-  console.log('       DISPUTEREADY — AI Evidence Evaluation Harness           ');
+  console.log('       Clario — AI Evidence Evaluation Harness           ');
   console.log('================================================================');
   console.log('Note: This is a small automated regression check, NOT human review.');
   console.log('Evaluates AI model compliance against official PayPal evidence rules.\n');

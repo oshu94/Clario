@@ -1,5 +1,5 @@
 /**
- * DisputeReady Server — Full-Stack HTTP API & Web Application
+ * Clario Server — Full-Stack HTTP API & Web Application
  * 
  * Implements:
  * - REST API for Dispute Listing, Details, AI Analysis, and Evidence Submission
@@ -293,7 +293,7 @@ export function startServer(port = PORT, host = '127.0.0.1'): Promise<number> {
   return new Promise((resolve) => {
     server.listen(port, host, () => {
       console.log(`\n================================================================`);
-      console.log(`   DISPUTEREADY — AI PayPal Dispute Evidence Copilot            `);
+      console.log(`   Clario — AI PayPal Dispute Evidence Copilot            `);
       console.log(`================================================================`);
       console.log(` Server running at: http://localhost:${port}`);
       console.log(` Live PayPal Sandbox Configured: ${isLivePayPalConfigured() ? 'YES' : 'NO (SIMULATION active)'}`);
@@ -305,7 +305,14 @@ export function startServer(port = PORT, host = '127.0.0.1'): Promise<number> {
 }
 
 // Auto-start if run directly
-if (process.argv[1]?.endsWith('server/index.ts') || process.argv[1]?.endsWith('server/index.js')) {
+
+// Auto-start if run directly
+const entryPath = process.argv[1]?.replace(/\\/g, '/');
+
+if (
+  entryPath?.endsWith('/src/server/index.ts') ||
+  entryPath?.endsWith('/src/server/index.js')
+) {
   startServer().catch((err) => {
     console.error('Server startup failed:', err);
     process.exit(1);

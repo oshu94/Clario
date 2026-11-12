@@ -1,4 +1,4 @@
-# DisputeReady: AI PayPal Dispute Evidence Copilot
+# Clario: AI PayPal Dispute Evidence Copilot
 
 > **Empowering merchants to defend PayPal disputes with verified facts, strict citations, and zero hallucinations.**
 
@@ -18,9 +18,9 @@ Merchants need an expert copilot that understands the **exact evidentiary requir
 
 ---
 
-## 2. What DisputeReady Does
+## 2. What Clario Does
 
-**DisputeReady** is a specialized defense workstation and AI evidence copilot:
+**Clario** is a specialized defense workstation and AI evidence copilot:
 
 - **Merchant Dashboard**: Real-time tracking of dispute counts by status, response deadlines, and lifecycle stages (`INQUIRY`, `CHARGEBACK`, etc.).
 - **Dispute Workspace**: Inspects buyer claims, original transaction records, and provides an evidence manager utilizing a 5-status taxonomy (`Provided`, `Missing`, `Needs Verification`, `Potentially Contradictory`, `Not Relevant`).
@@ -38,7 +38,7 @@ Merchants need an expert copilot that understands the **exact evidentiary requir
 
 ## 3. How PayPal is Used
 
-DisputeReady integrates directly with the **PayPal Customer Disputes API (v1)**:
+Clario integrates directly with the **PayPal Customer Disputes API (v1)**:
 
 - **OAuth 2.0 Server-Side Authentication**: `POST /v1/oauth2/token` using HTTP Basic Auth (`PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`).
 - **Dispute Listing**: `GET /v1/customer/disputes` retrieving active merchant claims.
@@ -52,7 +52,7 @@ DisputeReady integrates directly with the **PayPal Customer Disputes API (v1)**:
 
 ## 4. How AI is Used
 
-DisputeReady employs a dual AI architecture:
+Clario employs a dual AI architecture:
 
 1. **Live Gemini AI Provider (`gemini-2.5-flash`)**:
    - Structured JSON output mode with strict schema enforcement.
@@ -106,7 +106,7 @@ In the spirit of total hackathon integrity:
 
 ---
 
-## 8. What's Next for DisputeReady
+## 8. What's Next for Clario
 
 - **Multi-File PDF Bundler**: Merge multiple merchant documents into an indexed single PDF attachment to overcome PayPal's single `file1` form field.
 - **Automated Carrier API Polling**: Direct webhooks into FedEx, UPS, and DHL to automatically fetch delivery signatures upon dispute filing.

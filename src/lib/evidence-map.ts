@@ -738,9 +738,12 @@ export const EVIDENCE_MAP: Record<PayPalDisputeReason, ReasonEvidenceRule> = {
 /**
  * Returns evidence rule configuration for any PayPal dispute reason
  */
-export function getEvidenceRule(reason: string): ReasonEvidenceRule {
-  if (reason in EVIDENCE_MAP) {
+export function getEvidenceRule(
+  reason: string
+): ReasonEvidenceRule | null {
+  if (Object.prototype.hasOwnProperty.call(EVIDENCE_MAP, reason)) {
     return EVIDENCE_MAP[reason as PayPalDisputeReason];
   }
-  return EVIDENCE_MAP.OTHER;
+
+  return null;
 }

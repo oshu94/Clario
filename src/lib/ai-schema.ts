@@ -16,6 +16,7 @@
 
 import {
   PAYPAL_EVIDENCE_TYPES,
+  PAYPAL_DISPUTE_REASONS,
   type PayPalEvidenceType,
   type PayPalDisputeReason,
 } from './evidence-map.ts';
@@ -48,6 +49,7 @@ export interface ContradictionItem {
 export interface UnsupportedClaimItem {
   claim: string;
   reason: string;
+  source_ids: string[];
 }
 
 export interface RecommendedActionItem {
@@ -80,7 +82,7 @@ export interface EvidenceReadiness {
   contradictions_count: number;
   unverified_count: number;
   checklist: ReadinessChecklistItem[];
-  internal_readiness_score: number; // 0 - 100
+  internal_readiness_score: number;
   score_explanation: string;
 }
 
@@ -105,7 +107,7 @@ export interface MerchantEvidenceItem {
   title: string;
   type: string;
   content: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ValidationReport {
@@ -115,147 +117,348 @@ export interface ValidationReport {
   data?: AIAnalysisResult;
 }
 
-/**
- * Validates raw AI output against the required schema and citation constraints.
- */
+function isObject(value: unknown): value is Record<string, any> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isEvidenceType(value: unknown): value is PayPalEvidenceType {
+  return typeof value === 'string' &&
+    (PAYPAL_EVIDENCE_TYPES as readonly string[]).includes(value);
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string');
+}
+
+function checkSourceIds(
+  ids: unknown,
+  validSourceIds: Set<string>,
+  location: string,
+  errors: string[],
+  requireAtLeastOne = false
+): void {
+  if (!Array.isArray(ids) || !ids.every((id) => typeof id === 'string')) {
+    errors.push(`${location}: source_ids must be an array of strings.`);
+    return;
+  }
+
+  if (requireAtLeastOne && ids.length === 0) {
+    errors.push(`${location}: at least one source_id is required.`);
+  }
+
+  for (const id of ids) {
+    if (!validSourceIds.has(id)) {
+      errors.push(`${location}: unknown source_id '${id}'.`);
+    }
+  }
+}
+
 export function validateAIAnalysisResult(
-  raw: any,
+  raw: unknown,
   validSourceIds: Set<string>
 ): ValidationReport {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  if (!raw || typeof raw !== 'object') {
-    return { valid: false, errors: ['Output is not a valid JSON object.'], warnings: [] };
+  if (!isObject(raw)) {
+    return {
+      valid: false,
+      errors: ['Output is not a valid JSON object.'],
+      warnings: [],
+    };
   }
 
-  // 1. Validate dispute_summary
+  // Required top-level fields
+  if (typeof raw.dispute_id !== 'string' || !raw.dispute_id.trim()) {
+    errors.push('dispute_id must be a non-empty string.');
+  }
+
+  if (
+    typeof raw.reason !== 'string' ||
+    !(PAYPAL_DISPUTE_REASONS as readonly string[]).includes(raw.reason)
+  ) {
+    errors.push('reason is not a supported PayPal dispute reason.');
+  }
+
   if (typeof raw.dispute_summary !== 'string' || !raw.dispute_summary.trim()) {
-    errors.push('Missing or empty string for field: dispute_summary');
+    errors.push('dispute_summary must be a non-empty string.');
   }
 
-  // 2. Validate relevant_evidence
+  if (typeof raw.is_demo_mode !== 'boolean') {
+    errors.push('is_demo_mode must be a boolean.');
+  }
+
+  if (typeof raw.ai_provider !== 'string' || !raw.ai_provider.trim()) {
+    errors.push('ai_provider must be a non-empty string.');
+  }
+
+  if (
+    typeof raw.timestamp !== 'string' ||
+    Number.isNaN(Date.parse(raw.timestamp))
+  ) {
+    errors.push('timestamp must be a valid date string.');
+  }
+
+  // Relevant evidence
   if (!Array.isArray(raw.relevant_evidence)) {
-    errors.push('Field relevant_evidence must be an array.');
+    errors.push('relevant_evidence must be an array.');
   } else {
-    raw.relevant_evidence.forEach((item: any, idx: number) => {
-      if (!item.source_id || typeof item.source_id !== 'string') {
-        errors.push(`relevant_evidence[${idx}]: missing source_id`);
-      } else if (!validSourceIds.has(item.source_id)) {
-        errors.push(`relevant_evidence[${idx}]: cites non-existent source_id '${item.source_id}'`);
+    raw.relevant_evidence.forEach((item: unknown, index: number) => {
+      const path = `relevant_evidence[${index}]`;
+
+      if (!isObject(item)) {
+        errors.push(`${path} must be an object.`);
+        return;
       }
-      if (!item.finding || typeof item.finding !== 'string') {
-        errors.push(`relevant_evidence[${idx}]: missing finding`);
+
+      if (typeof item.source_id !== 'string' || !validSourceIds.has(item.source_id)) {
+        errors.push(`${path} contains an invalid source_id.`);
       }
-      if (!item.evidence_type || !PAYPAL_EVIDENCE_TYPES.includes(item.evidence_type)) {
-        errors.push(`relevant_evidence[${idx}]: invalid PayPal evidence_type '${item.evidence_type}'`);
+
+      if (typeof item.finding !== 'string' || !item.finding.trim()) {
+        errors.push(`${path}.finding must be a non-empty string.`);
       }
+
+      if (!isEvidenceType(item.evidence_type)) {
+        errors.push(`${path}.evidence_type is not a valid PayPal evidence type.`);
+      }
+
       if (!['VERIFIED', 'UNVERIFIED'].includes(item.verification_status)) {
-        errors.push(`relevant_evidence[${idx}]: verification_status must be 'VERIFIED' or 'UNVERIFIED'`);
+        errors.push(`${path}.verification_status is invalid.`);
       }
     });
   }
 
-  // 3. Validate missing_evidence
+  // Missing evidence
   if (!Array.isArray(raw.missing_evidence)) {
-    errors.push('Field missing_evidence must be an array.');
+    errors.push('missing_evidence must be an array.');
   } else {
-    raw.missing_evidence.forEach((item: any, idx: number) => {
-      if (!item.requirement || typeof item.requirement !== 'string') {
-        errors.push(`missing_evidence[${idx}]: missing requirement description`);
+    raw.missing_evidence.forEach((item: unknown, index: number) => {
+      const path = `missing_evidence[${index}]`;
+
+      if (!isObject(item)) {
+        errors.push(`${path} must be an object.`);
+        return;
       }
-      if (!item.suggested_evidence_type || !PAYPAL_EVIDENCE_TYPES.includes(item.suggested_evidence_type)) {
-        errors.push(`missing_evidence[${idx}]: invalid suggested_evidence_type '${item.suggested_evidence_type}'`);
+
+      if (typeof item.requirement !== 'string' || !item.requirement.trim()) {
+        errors.push(`${path}.requirement is required.`);
       }
+
+      if (!isEvidenceType(item.suggested_evidence_type)) {
+        errors.push(`${path}.suggested_evidence_type is invalid.`);
+      }
+
       if (typeof item.critical_for_defense !== 'boolean') {
-        errors.push(`missing_evidence[${idx}]: critical_for_defense must be boolean`);
+        errors.push(`${path}.critical_for_defense must be a boolean.`);
+      }
+
+      if (
+        typeof item.reason_guidance_ref !== 'string' ||
+        !item.reason_guidance_ref.startsWith('https://developer.paypal.com/')
+      ) {
+        errors.push(`${path}.reason_guidance_ref must be an official PayPal guidance URL.`);
       }
     });
   }
 
-  // 4. Validate contradictions
+  // Contradictions
   if (!Array.isArray(raw.contradictions)) {
-    errors.push('Field contradictions must be an array.');
+    errors.push('contradictions must be an array.');
   } else {
-    raw.contradictions.forEach((item: any, idx: number) => {
-      if (!item.description || typeof item.description !== 'string') {
-        errors.push(`contradictions[${idx}]: missing description`);
+    raw.contradictions.forEach((item: unknown, index: number) => {
+      const path = `contradictions[${index}]`;
+
+      if (!isObject(item)) {
+        errors.push(`${path} must be an object.`);
+        return;
       }
-      if (!Array.isArray(item.conflicting_source_ids)) {
-        errors.push(`contradictions[${idx}]: conflicting_source_ids must be an array`);
+
+      if (typeof item.description !== 'string' || !item.description.trim()) {
+        errors.push(`${path}.description is required.`);
+      }
+
+      if (!isStringArray(item.conflicting_source_ids)) {
+        errors.push(`${path}.conflicting_source_ids must be an array of strings.`);
       } else {
-        item.conflicting_source_ids.forEach((sid: string) => {
-          if (!validSourceIds.has(sid)) {
-            errors.push(`contradictions[${idx}]: cites invalid conflicting source_id '${sid}'`);
-          }
-        });
+        if (item.conflicting_source_ids.length < 2) {
+          errors.push(`${path} must reference at least two sources.`);
+        }
+
+        checkSourceIds(
+          item.conflicting_source_ids,
+          validSourceIds,
+          path,
+          errors
+        );
+      }
+
+      if (!['HIGH', 'MEDIUM'].includes(item.severity)) {
+        errors.push(`${path}.severity is invalid.`);
       }
     });
   }
 
-  // 5. Validate unsupported_claims
+  // Unsupported claims
   if (!Array.isArray(raw.unsupported_claims)) {
-    errors.push('Field unsupported_claims must be an array.');
+    errors.push('unsupported_claims must be an array.');
+  } else {
+    raw.unsupported_claims.forEach((item: unknown, index: number) => {
+      const path = `unsupported_claims[${index}]`;
+
+      if (!isObject(item)) {
+        errors.push(`${path} must be an object.`);
+        return;
+      }
+
+      if (typeof item.claim !== 'string' || !item.claim.trim()) {
+        errors.push(`${path}.claim is required.`);
+      }
+
+      if (typeof item.reason !== 'string' || !item.reason.trim()) {
+        errors.push(`${path}.reason is required.`);
+      }
+
+      checkSourceIds(item.source_ids, validSourceIds, path, errors);
+    });
   }
 
-  // 6. Validate recommended_actions
+  // Recommended actions
   if (!Array.isArray(raw.recommended_actions)) {
-    errors.push('Field recommended_actions must be an array.');
+    errors.push('recommended_actions must be an array.');
   } else {
-    raw.recommended_actions.forEach((item: any, idx: number) => {
-      if (!item.action || typeof item.action !== 'string') {
-        errors.push(`recommended_actions[${idx}]: missing action text`);
+    raw.recommended_actions.forEach((item: unknown, index: number) => {
+      const path = `recommended_actions[${index}]`;
+
+      if (!isObject(item)) {
+        errors.push(`${path} must be an object.`);
+        return;
       }
-      if (!item.evidence_type || !PAYPAL_EVIDENCE_TYPES.includes(item.evidence_type)) {
-        errors.push(`recommended_actions[${idx}]: invalid evidence_type '${item.evidence_type}'`);
+
+      if (typeof item.action !== 'string' || !item.action.trim()) {
+        errors.push(`${path}.action is required.`);
+      }
+
+      if (!isEvidenceType(item.evidence_type)) {
+        errors.push(`${path}.evidence_type is invalid.`);
+      }
+
+      if (!['IMMEDIATE', 'HIGH', 'OPTIONAL'].includes(item.priority)) {
+        errors.push(`${path}.priority is invalid.`);
       }
     });
   }
 
-  // 7. Validate response_draft
-  if (!raw.response_draft || typeof raw.response_draft !== 'object') {
-    errors.push('Missing response_draft object.');
+  // Response draft
+  if (!isObject(raw.response_draft)) {
+    errors.push('response_draft must be an object.');
   } else {
     const draft = raw.response_draft;
+
     if (typeof draft.notes !== 'string') {
       errors.push('response_draft.notes must be a string.');
-    } else {
-      if (draft.notes.length > 2000) {
-        errors.push(`response_draft.notes length (${draft.notes.length}) exceeds PayPal limit of 2000 characters.`);
-      }
+    } else if (draft.notes.length > 2000) {
+      errors.push('response_draft.notes exceeds the 2000-character limit.');
     }
 
-    if (Array.isArray(draft.sentences)) {
-      draft.sentences.forEach((sent: any, sIdx: number) => {
-        if (!sent.text || typeof sent.text !== 'string') {
-          errors.push(`response_draft.sentences[${sIdx}]: missing sentence text`);
+    checkSourceIds(
+      draft.cited_source_ids,
+      validSourceIds,
+      'response_draft.cited_source_ids',
+      errors
+    );
+
+    if (!Array.isArray(draft.sentences)) {
+      errors.push('response_draft.sentences must be an array.');
+    } else {
+      draft.sentences.forEach((sentence: unknown, index: number) => {
+        const path = `response_draft.sentences[${index}]`;
+
+        if (!isObject(sentence)) {
+          errors.push(`${path} must be an object.`);
+          return;
         }
-        if (!Array.isArray(sent.source_ids) || sent.source_ids.length === 0) {
-          warnings.push(`response_draft.sentences[${sIdx}]: uncited sentence detected ("${sent.text.slice(0, 30)}...")`);
-        } else {
-          sent.source_ids.forEach((sid: string) => {
-            if (!validSourceIds.has(sid)) {
-              errors.push(`response_draft.sentences[${sIdx}]: cites unknown source_id '${sid}'`);
-            }
-          });
+
+        if (typeof sentence.text !== 'string' || !sentence.text.trim()) {
+          errors.push(`${path}.text is required.`);
         }
+
+        checkSourceIds(
+          sentence.source_ids,
+          validSourceIds,
+          path,
+          errors,
+          true
+        );
       });
     }
   }
 
-  // 8. Validate evidence_readiness
-  if (!raw.evidence_readiness || typeof raw.evidence_readiness !== 'object') {
-    errors.push('Missing evidence_readiness object.');
+  // Evidence readiness
+  if (!isObject(raw.evidence_readiness)) {
+    errors.push('evidence_readiness must be an object.');
   } else {
-    const er = raw.evidence_readiness;
-    if (typeof er.internal_readiness_score !== 'number' || er.internal_readiness_score < 0 || er.internal_readiness_score > 100) {
-      errors.push('evidence_readiness.internal_readiness_score must be a number between 0 and 100.');
+    const readiness = raw.evidence_readiness;
+
+    for (const field of [
+      'available_count',
+      'missing_count',
+      'contradictions_count',
+      'unverified_count',
+    ]) {
+      if (!Number.isInteger(readiness[field]) || readiness[field] < 0) {
+        errors.push(`evidence_readiness.${field} must be a non-negative integer.`);
+      }
     }
-    if (!er.score_explanation || typeof er.score_explanation !== 'string') {
-      errors.push('evidence_readiness.score_explanation must explain how the internal indicator was calculated.');
+
+    if (
+      typeof readiness.internal_readiness_score !== 'number' ||
+      !Number.isFinite(readiness.internal_readiness_score) ||
+      readiness.internal_readiness_score < 0 ||
+      readiness.internal_readiness_score > 100
+    ) {
+      errors.push('internal_readiness_score must be between 0 and 100.');
     }
-    if (!Array.isArray(er.checklist)) {
+
+    if (
+      typeof readiness.score_explanation !== 'string' ||
+      !readiness.score_explanation.trim()
+    ) {
+      errors.push('score_explanation is required.');
+    }
+
+    if (!Array.isArray(readiness.checklist)) {
       errors.push('evidence_readiness.checklist must be an array.');
+    } else {
+      readiness.checklist.forEach((item: unknown, index: number) => {
+        const path = `evidence_readiness.checklist[${index}]`;
+
+        if (!isObject(item)) {
+          errors.push(`${path} must be an object.`);
+          return;
+        }
+
+        if (typeof item.item !== 'string' || !item.item.trim()) {
+          errors.push(`${path}.item is required.`);
+        }
+
+        if (!['SATISFIED', 'MISSING', 'WARNING'].includes(item.status)) {
+          errors.push(`${path}.status is invalid.`);
+        }
+
+        if (item.source_id !== undefined) {
+          if (
+            typeof item.source_id !== 'string' ||
+            !validSourceIds.has(item.source_id)
+          ) {
+            errors.push(`${path}.source_id is invalid.`);
+          }
+        }
+
+        if (item.notes !== undefined && typeof item.notes !== 'string') {
+          errors.push(`${path}.notes must be a string.`);
+        }
+      });
     }
   }
 
@@ -267,6 +470,6 @@ export function validateAIAnalysisResult(
     valid: true,
     errors: [],
     warnings,
-    data: raw as AIAnalysisResult,
+    data: raw as unknown as AIAnalysisResult,
   };
 }

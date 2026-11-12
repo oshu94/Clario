@@ -16,7 +16,7 @@ import {
 } from '../src/lib/paypal-client.ts';
 
 async function main() {
-  console.log('=== DISPUTEREADY: PayPal Sandbox Dispute Creator ===');
+  console.log('=== Clario: PayPal Sandbox Dispute Creator ===');
 
   const creds = getPayPalCredentials();
   if (!creds) {

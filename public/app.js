@@ -1,5 +1,5 @@
 /**
- * DisputeReady Frontend Application
+ * Clario Frontend Application
  * 
  * Drives dashboard, dispute workspace, AI evidence copilot, and approval submission gate.
  */

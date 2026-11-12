@@ -19,7 +19,7 @@ import {
 
 async function runSmokeTest() {
   console.log('====================================================');
-  console.log('   DISPUTEREADY — PayPal Sandbox Smoke Test        ');
+  console.log('   Clario — PayPal Sandbox Smoke Test        ');
   console.log('====================================================\n');
 
   console.log('1. Checking Server Environment Credentials...');

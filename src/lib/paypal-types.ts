@@ -3,6 +3,11 @@
  * https://developer.paypal.com/api/customer-disputes/v1/
  */
 
+/**
+ * PayPal Customer Disputes API v1 types.
+ * Reference: https://developer.paypal.com/api/customer-disputes/v1/
+ */
+
 export type DisputeStatus =
   | 'OPEN'
   | 'WAITING_FOR_BUYER_RESPONSE'
@@ -17,7 +22,7 @@ export type DisputeLifeCycleStage =
   | 'PRE_ARBITRATION'
   | 'ARBITRATION';
 
-export type DisputeChannel = 'INTERNAL' | 'ACH' | 'CHARGEBACK';
+export type DisputeChannel = 'INTERNAL' | 'EXTERNAL' | 'ALERT';
 
 export interface HateoasLink {
   href: string;
@@ -46,18 +51,18 @@ export interface DisputedTransaction {
     merchant_id?: string;
     name?: string;
   };
-  items?: {
+  items?: Array<{
     item_name?: string;
     item_description?: string;
     item_quantity?: string;
     item_price?: Money;
-  }[];
+  }>;
 }
 
 export interface DisputeTrackingInfo {
   carrier_name: string;
   tracking_number: string;
-  carrier_url?: string;
+  tracking_url?: string;
 }
 
 export interface DisputeEvidenceInfo {
@@ -66,7 +71,7 @@ export interface DisputeEvidenceInfo {
 }
 
 export interface DisputeDocument {
-  name: string;
+  name?: string;
   url?: string;
 }
 
@@ -75,7 +80,12 @@ export interface DisputeEvidence {
   evidence_info?: DisputeEvidenceInfo;
   notes?: string;
   documents?: DisputeDocument[];
-  source?: 'BUYER' | 'SELLER' | 'PAYPAL' | 'REQUESTED_FROM_SELLER' | 'REQUESTED_FROM_BUYER';
+  source?:
+    | 'BUYER'
+    | 'SELLER'
+    | 'PAYPAL'
+    | 'REQUESTED_FROM_SELLER'
+    | 'REQUESTED_FROM_BUYER';
   date?: string;
   item_id?: string;
 }
@@ -90,7 +100,7 @@ export interface DisputeSummaryItem {
   dispute_channel?: DisputeChannel;
   reason: string;
   seller_response_due_date?: string;
-  links: HateoasLink[];
+  links?: HateoasLink[];
   is_simulation?: boolean;
 }
 
@@ -102,37 +112,39 @@ export interface DisputeListResponse {
   is_simulation?: boolean;
 }
 
+export interface DisputeMessage {
+  posted_by: 'BUYER' | 'SELLER' | 'ARBITER';
+  time_posted: string;
+  content: string;
+}
+
 export interface DisputeDetails extends DisputeSummaryItem {
   disputed_transactions?: DisputedTransaction[];
   evidences?: DisputeEvidence[];
   offer?: {
     buyer_requested_amount?: Money;
     seller_offered_amount?: Money;
-    history?: {
+    history?: Array<{
       offer_time?: string;
       actor?: string;
       event_type?: string;
       offer_type?: string;
       offer_amount?: Money;
-    }[];
+    }>;
   };
-  messages?: {
-    posted_by: 'BUYER' | 'SELLER' | 'PAYPAL';
-    time_posted: string;
-    content: string;
-  }[];
-  adjudications?: {
+  messages?: DisputeMessage[];
+  adjudications?: Array<{
     type?: string;
     adjudication_time?: string;
     reason?: string;
     disposition?: string;
-  }[];
+  }>;
 }
 
 export interface ProvideEvidencePayload {
-  evidences: {
+  evidences: Array<{
     evidence_type: string;
     evidence_info?: DisputeEvidenceInfo;
     notes?: string;
-  }[];
+  }>;
 }

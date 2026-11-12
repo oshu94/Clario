@@ -1,4 +1,4 @@
-# DisputeReady: Video Demo Script (Under 3 Minutes)
+# Clario: Video Demo Script (Under 3 Minutes)
 
 > **Tone**: Professional, crisp, transparent, and authoritative.  
 > **Duration**: ~2 minutes 45 seconds  
@@ -8,14 +8,14 @@
 
 ### [0:00 - 0:30] Introduction & The Problem
 
-**[VISUAL]**: Close-up of the DisputeReady Dashboard running at `http://localhost:3000`. Clean, dark fintech UI showing Active Disputes, Response Deadlines, and the Live Mode Banner.
+**[VISUAL]**: Close-up of the Clario Dashboard running at `http://localhost:3000`. Clean, dark fintech UI showing Active Disputes, Response Deadlines, and the Live Mode Banner.
 
 **[SPEAKER]**:
-> "Hi everyone, this is **DisputeReady**, an AI Evidence Copilot built for the PayPal AI Hackathon.
+> "Hi everyone, this is **Clario**, an AI Evidence Copilot built for the PayPal AI Hackathon.
 > 
 > When merchants receive a dispute on PayPal, defending it is stressful, procedural, and unforgiving. Submitting the wrong evidence type—or claiming an item was delivered when tracking only says 'Label Created'—causes automatic claim forfeiture.
 > 
-> DisputeReady solves this by bringing AI intelligence directly onto the official PayPal Customer Disputes API v1, grounding every recommendation in official reason guidance and enforcing strict evidence citations."
+> Clario solves this by bringing AI intelligence directly onto the official PayPal Customer Disputes API v1, grounding every recommendation in official reason guidance and enforcing strict evidence citations."
 
 ---
 
@@ -24,7 +24,7 @@
 **[VISUAL]**: Cursor highlights the top-right status badges: `PAYPAL: SIMULATION` and `AI: DEMO`. Then, the cursor clicks on Case `PP-D-48921` (`MERCHANDISE_OR_SERVICE_NOT_RECEIVED`).
 
 **[SPEAKER]**:
-> "Let's be completely transparent: DisputeReady features a dual-mode architecture. When live PayPal sandbox credentials are in `.env`, it calls PayPal's REST endpoints directly. Today, in this demo environment without ambient credentials, our isolated simulation service is active—clearly labeled throughout the UI.
+> "Let's be completely transparent: Clario features a dual-mode architecture. When live PayPal sandbox credentials are in `.env`, it calls PayPal's REST endpoints directly. Today, in this demo environment without ambient credentials, our isolated simulation service is active—clearly labeled throughout the UI.
 > 
 > Let's open Case **PP-D-48921**, an Item Not Received dispute for $189.99.
 > 
@@ -39,7 +39,7 @@
 **[VISUAL]**: Cursor clicks the glowing **"Analyze Evidence with AI"** button. The AI Copilot panel animates, revealing the Internal Readiness Score (67%), the checklist, the Unsupported Claims Warning, Relevant Evidence, and Missing Critical Evidence.
 
 **[SPEAKER]**:
-> "Now, watch the AI Copilot in action. When we click 'Analyze Evidence with AI', DisputeReady compiles a canonical source registry and evaluates the case against PayPal's specific rules for Item Not Received claims.
+> "Now, watch the AI Copilot in action. When we click 'Analyze Evidence with AI', Clario compiles a canonical source registry and evaluates the case against PayPal's specific rules for Item Not Received claims.
 > 
 > Look at the findings:
 > First, our **Internal Readiness Indicator** is at 67%. Notice it's not a fake 'win probability'—it's an honest checklist showing which defense requirements have been satisfied.
@@ -78,7 +78,7 @@
 > 
 > Running `npm run eval` executes an automated regression suite across three synthetic scenarios: Item Not Received, Not As Described contradiction, and an unverified refund. All 9 defensive criteria passed with 100% measured accuracy.
 > 
-> DisputeReady turns dispute defense from an error-prone gamble into a verified, compliant, and intelligent workflow for PayPal merchants.
+> Clario turns dispute defense from an error-prone gamble into a verified, compliant, and intelligent workflow for PayPal merchants.
 > 
 > Thank you!"
 

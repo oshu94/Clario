@@ -1,7 +1,7 @@
 {
-  "name": "disputeready",
+  "name": "Clario",
   "version": "1.0.0",
-  "description": "DisputeReady - AI PayPal Dispute Evidence Copilot",
+  "description": "Clario - AI PayPal Dispute Evidence Copilot",
   "type": "module",
   "scripts": {
     "start": "node --experimental-strip-types src/server/index.ts",
@@ -17,6 +17,6 @@
     "copilot",
     "evidence"
   ],
-  "author": "DisputeReady Team",
+  "author": "Clario Team",
   "license": "MIT"
 }

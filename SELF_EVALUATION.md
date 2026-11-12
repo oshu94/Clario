@@ -1,6 +1,6 @@
-# DisputeReady — Transparent Self-Evaluation & Audit
+# Clario — Transparent Self-Evaluation & Audit
 
-This document provides a rigorous, evidence-backed self-evaluation of DisputeReady for the PayPal AI Hackathon. In accordance with hackathon rules, all capabilities are evaluated objectively without inflated claims.
+This document provides a rigorous, evidence-backed self-evaluation of Clario for the PayPal AI Hackathon. In accordance with hackathon rules, all capabilities are evaluated objectively without inflated claims.
 
 ---
 
@@ -31,8 +31,8 @@ This document provides a rigorous, evidence-backed self-evaluation of DisputeRea
 
 ## 2. Unverified API Operations & Remaining Blockers
 
-1. **Undocumented Multiple File Parts**: Official PayPal Customer Disputes v1 documentation explicitly details `file1`. Submitting multiple attachments (`file2`, `file3`) is undocumented; DisputeReady adheres strictly to `file1`.
-2. **Buyer-Side Dispute Creation Scope (`DISPUTE_CREATE`)**: PayPal developer documentation indicates that programmatic buyer dispute creation requires custom approval from a PayPal account manager. DisputeReady provides the script (`scripts/create-sandbox-dispute.ts`) and handles missing scopes with clear diagnostics.
+1. **Undocumented Multiple File Parts**: Official PayPal Customer Disputes v1 documentation explicitly details `file1`. Submitting multiple attachments (`file2`, `file3`) is undocumented; Clario adheres strictly to `file1`.
+2. **Buyer-Side Dispute Creation Scope (`DISPUTE_CREATE`)**: PayPal developer documentation indicates that programmatic buyer dispute creation requires custom approval from a PayPal account manager. Clario provides the script (`scripts/create-sandbox-dispute.ts`) and handles missing scopes with clear diagnostics.
 3. **Sandbox Webhook Delivery Latency**: Webhook latency in the sandbox environment is variable and remains outside merchant control.
 
 ---
